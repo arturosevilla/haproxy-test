@@ -1,0 +1,3 @@
+This is a toy project used to understand HAProxy configuration for a Neo4j HA cluster
+
+There are two parts to this project: HAProxy itself, and running multiple instances of the web instances. The proposed configuration file is included in the project, as well as bash script in order to ease running the instances and changing the status of an instance in the cluster.
