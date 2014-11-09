@@ -48,7 +48,7 @@ def change_master():
 
 def crash_master():
     # this function just makes master unavailable
-    make_request(master, False)
+    make_request(determine_master(), False)
 
 
 if __name__ == '__main__':

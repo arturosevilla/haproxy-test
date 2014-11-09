@@ -58,5 +58,5 @@ if __name__ == '__main__':
     node_id = int(sys.argv[3])
     print('Running %s instance on port %d with instance id: %d' % (
         'master' if master else 'slave', port_number, node_id))
-    app.run(port=port_number, debug=True)
+    app.run(port=port_number, threaded=True)
 
