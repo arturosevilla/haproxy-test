@@ -4,7 +4,8 @@ import urllib2
 import sys
 
 # the initial master address
-instances = ['http://localhost:5000', 'http://localhost:5001']
+instances = ['http://localhost:5000', 'http://localhost:5001',
+             'http://localhost:5002']
 
 def make_request(address, master_flag):
     req = urllib2.Request(address + '/change/status')
@@ -27,14 +28,18 @@ def determine_master():
             continue
         if response.getcode() == 200:
             return configured_address
-    raise Exception('Master not found')
+    return None
 
 def change_master():
     if len(instances) == 1:
         raise Exception('To change masters, the cluster needs to have at least two instances')
     try:
         current_master = determine_master()
-        master_index = instances.index(current_master)
+        if current_master is None:
+            # this will be added by one and reset it to 0
+            master_index = -1
+        else:
+            master_index = instances.index(current_master)
     except ValueError:
         raise Exception('Misconfigured? %s was not found among instances' % master)
     
@@ -42,7 +47,8 @@ def change_master():
     master_index = (master_index + 1) % len(instances)
     new_master = instances[master_index]
     # make the old master a slave
-    make_request(current_master, False)
+    if current_master is not None:
+        make_request(current_master, False)
     # make the selected instance the master
     make_request(new_master, True)
 

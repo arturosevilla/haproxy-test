@@ -1,3 +1,35 @@
 This is a toy project used to understand HAProxy configuration for a Neo4j HA cluster
 
 There are two parts to this project: HAProxy itself, and running multiple instances of the web instances. The proposed configuration file is included in the project, as well as bash script in order to ease running the instances and changing the status of an instance in the cluster.
+
+For testing the project you can run three instances of the web project as follows:
+$ ./web.py 5000 master 1
+$ ./web.py 5001 slave 2
+$ ./web.py 5002 slave 3
+
+Note: By default, all of the configuration files are written based on the assumption that the user will run three instances.
+
+Parameter explanation:
+* First parameter (5000) is the port number where the instance will bind itself.
+* Second parameter (master|slave) determines the master status of the instance.
+* Third parameter (1) is any number that will uniquely identify the instance. This the data that will be returned by /query HTTP call.
+
+At any time you can cycle between masters by calling:
+$ ./scenarios.py
+
+Also, at any time you can simulate no master in the cluster as:
+$ ./scenarios.py crash
+
+To bring back a master just re-run ./scenarios.py
+
+You can also run haproxy with the configuration file:
+
+$ /usr/sbin/haproxy -f path/to/haproxyneo4j.config
+
+Finally, to test the whole thing, you can go into any browser, and try:
+* http://localhost:4000/query This should bring {"node_id": 1} at first, and this is the entry point for queries preferring the master (write operations). However if there is no master, it will select ANY instance.
+* http://localhost:4001/query This should bring {"node_id": 2|3} at first, and this is the entry point for queries preferring the slaves (read operations).
+
+Going to http://localhost:8080/haproxy?stats will bring the current stats.
+
+After this running ./scenarios.py, killing the web instances, or any operation that affects the ./web.py instances would be handled by HAProxy.
